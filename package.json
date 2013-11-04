@@ -1,15 +1,15 @@
 {
-  "title":"NPMD UI - List View On Scroll",
-  "name": "npmd-ui-list-view-on-scroll",
+  "title":"NPMD UI - Modal",
+  "name": "npmd-ui-modal",
   "description": "An on scroll effect template that animates the sides of sections once they are in the viewport.",
-  "version": "0.0.4",
+  "version": "0.0.1",
   "main": "index.js",
   "engines": {
     "node": ">=0.10.x"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.amexpub.com:modules/list-view-on-scroll.git"
+    "url": "git@github.amexpub.com:modules/npmd-ui-modal.git"
   },
   "scripts": {
     "install": "grunt copy",

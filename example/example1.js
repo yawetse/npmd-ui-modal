@@ -19,32 +19,25 @@ module.exports = require('./bower_components/jquery/jquery.min.js');
 },{"./bower_components/jquery/jquery.min.js":1}],3:[function(require,module,exports){
 'use strict';
 
-var listViewOnScroll = require('../../index'),
+var npmd_ui_model = require('../../index'),
 	$ = require('npmd-jquery');
 
 $(function(){
-	// alert("jquery works");
-	// new listViewOnScroll( document.getElementById( 'cbp-so-scroller' ) ); //no jquery
-	var templateHtmlFromAjax,
-		sampleJSONFromAjax;
-
-	var listviewscroll1 = listViewOnScroll({
-		el:$("#cbp-so-scroller").get(0)
-	});
-	listviewscroll1.init()
+	var modal1 = npmd_ui_model({data:"data"})
+	modal1.init();
 });
 
 },{"../../index":4,"npmd-jquery":2}],4:[function(require,module,exports){
 /*
- * Alist-view-on-scroll
+ * npmd-ui-modal
  * http://github.amexpub.com/modules/Alist-view-on-scroll
  *
  * Copyright (c) 2013 AmexPub. All rights reserved.
  */
 
-module.exports = require('./lib/list-view-on-scroll');
+module.exports = require('./lib/npmd-ui-modal');
 
-},{"./lib/list-view-on-scroll":5}],5:[function(require,module,exports){
+},{"./lib/npmd-ui-modal":5}],5:[function(require,module,exports){
 
 /*
  * Alist-view-on-scroll
@@ -71,135 +64,55 @@ module.exports = require('./lib/list-view-on-scroll');
 var Modernizr = require('browsernizr'),
 	classie = require('classie');
 
-var docElem = window.document.documentElement;
+function npmd_ui_modal(options){
+	function init() {
 
-function getViewportH() {
-	var client = docElem.clientHeight,
-		inner = window.innerHeight;
-	if( client < inner ){
-		return inner;
-	}
-	else{
-		return client;
-	}
-}
+		var overlay = document.querySelector( '.md-overlay' );
 
-function scrollY() {
-	return window.pageYOffset || docElem.scrollTop;
-}
+		[].slice.call( document.querySelectorAll( '.md-trigger' ) ).forEach( function( el, i ) {
 
-// http://stackoverflow.com/a/5598797/989439
-function getOffset( el ) {
-	var offsetTop = 0, offsetLeft = 0;
-	do {
-		if ( !isNaN( el.offsetTop ) ) {
-			offsetTop += el.offsetTop;
-		}
-		if ( !isNaN( el.offsetLeft ) ) {
-			offsetLeft += el.offsetLeft;
-		}
-	} while( el === el.offsetParent ); //changed for linting
+			var modal = document.querySelector( '#' + el.getAttribute( 'data-modal' ) ),
+				close = modal.querySelector( '.md-close' );
 
-	return {
-		top : offsetTop,
-		left : offsetLeft
-	};
-}
+			function removeModal( hasPerspective ) {
+				classie.remove( modal, 'md-show' );
 
-function inViewport( el, h ) {
-	var elH = el.offsetHeight,
-		scrolled = scrollY(),
-		viewed = scrolled + getViewportH(),
-		elTop = getOffset(el).top,
-		elBottom = elTop + elH;
-		// if 0, the element is considered in the viewport as soon as it enters.
-		// if 1, the element is considered in the viewport only when it's fully inside
-		// value in percentage (1 >= h >= 0)
-		h = h || 0;
-
-	return (elTop + elH * h) <= viewed && (elBottom) >= scrolled;
-}
-
-function extend( a, b ) {
-	for( var key in b ) {
-		if( b.hasOwnProperty( key ) ) {
-			a[key] = b[key];
-		}
-	}
-	return a;
-}
-
-
-
-
-function listViewOnScroll(options){
-	var el = options.el,
-		defaults = {
-			// The viewportFactor defines how much of the appearing item has to be visible in order to trigger the animation
-			// if we'd use a value of 0, this would mean that it would add the animation class as soon as the item is in the viewport. 
-			// If we were to use the value of 1, the animation would only be triggered when we see all of the item in the viewport (100% of it)
-			viewportFactor : 0.2
-		},
-		sections = Array.prototype.slice.call( el.querySelectorAll( '.cbp-so-section' ) ),
-		didScroll = false;
-
-	options = extend( options, defaults );
-
-	function _init() {
-		if( Modernizr.touch ) {return;}
-
-
-		// the sections already shown...
-		sections.forEach( function( el, i ) {
-			if( !inViewport( el ) ) {
-				classie.add( el, 'cbp-so-init' );
+				if( hasPerspective ) {
+					classie.remove( document.documentElement, 'md-perspective' );
+				}
 			}
+
+			function removeModalHandler() {
+				removeModal( classie.has( el, 'md-setperspective' ) );
+			}
+
+			el.addEventListener( 'click', function( ev ) {
+				classie.add( modal, 'md-show' );
+				overlay.removeEventListener( 'click', removeModalHandler );
+				overlay.addEventListener( 'click', removeModalHandler );
+
+				if( classie.has( el, 'md-setperspective' ) ) {
+					setTimeout( function() {
+						classie.add( document.documentElement, 'md-perspective' );
+					}, 25 );
+				}
+			});
+
+			close.addEventListener( 'click', function( ev ) {
+				ev.stopPropagation();
+				removeModalHandler();
+			});
+
 		} );
 
-		function scrollHandler() {
-			if( !didScroll ) {
-				didScroll = true;
-				setTimeout( function() { _scrollPage(); }, 60 );
-			}
-		}
-		function resizeHandler(){
-			function delayed() {
-				_scrollPage();
-				resizeTimeout = null;
-			}
-
-			var resizeTimeout = setTimeout( delayed, 200 );
-
-			if ( resizeTimeout ) {
-				clearTimeout( resizeTimeout );
-			}
-		}
-
-		window.addEventListener( 'scroll', scrollHandler, false );
-		window.addEventListener( 'resize', resizeHandler, false );
-	}
-	function _scrollPage() {
-
-		sections.forEach( function( el, i ) {
-			if( inViewport( el, options.viewportFactor ) ) {
-				classie.add( el, 'cbp-so-animate' );
-			}
-			else {
-				// this add class init if it doesn't have it. This will ensure that the items initially in the viewport will also animate on scroll
-				classie.add( el, 'cbp-so-init' );
-				classie.remove( el, 'cbp-so-animate' );
-			}
-		});
-		didScroll = false;
 	}
 
 	return {
-		el:el,
-		init:_init
+		init:init
 	};
 }
 
-module.exports = listViewOnScroll;
+module.exports = npmd_ui_modal;
 },{"browsernizr":6,"classie":15}],6:[function(require,module,exports){
 var Modernizr = require('./lib/Modernizr'),
     ModernizrProto = require('./lib/ModernizrProto'),

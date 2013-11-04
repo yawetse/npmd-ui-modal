@@ -1,5 +1,5 @@
 /*
- * Alist-view-on-scroll
+ * npmd-ui-modal
  * http://github.amexpub.com/modules/Alist-view-on-scroll
  *
  * Copyright (c) 2013 Amex Pub. All rights reserved.
@@ -62,18 +62,12 @@ module.exports = function(grunt) {
 
           // includes files within path and its sub-directories
           // {expand: true, src: ['assets/**'], dest: '../module/assets/'},
-          {expand: true,cwd: 'dist', src: ['**'], dest: '../../public/node_assets/npmd-ui-list-view-on-scroll/'},
-          {expand: true,cwd: 'lib', src: ['list-view-on-scroll.js'], dest: '../../public/node_assets/npmd-ui-list-view-on-scroll/'},
-
-          // makes all src relative to cwd
-          // {expand: true, cwd: 'path/', src: ['**'], dest: 'dest/'},
-
-          // flattens results to a single level
-          // {expand: true, flatten: true, src: ['path/**'], dest: 'dest/', filter: 'isFile'}
+          {expand: true,cwd: 'dist', src: ['**'], dest: '../../public/node_assets/npmd-ui-modal/'},
+          {expand: true,cwd: 'lib', src: ['npmd-ui-modal.js'], dest: '../../public/node_assets/npmd-ui-modal/'}
         ]
       }
     },
-    clean: ['../../public/node_assets/npmd-ui-list-view-on-scroll/'],
+    clean: ['../../public/node_assets/npmd-ui-modal/'],
     watch: {
       scripts: {
         // files: '**/*.js',
@@ -119,7 +113,7 @@ module.exports = function(grunt) {
 
   grunt.event.on('watch', function(action, filepath, target) {
     exec("browserify "+__dirname+"/example/src/example1_main.js -o "+__dirname+"/example/example1.js");
-    console.log("blah");
+    console.log("browserify "+__dirname+"/example/src/example1_main.js -o "+__dirname+"/example/example1.js");
     grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
   });
 };
